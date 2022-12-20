@@ -75,6 +75,14 @@ auto lexString(lsystem p) -> std::vector<actions> {
         action = split;
         break;
       }
+      case '/': {
+        action = half_speed;
+        break;
+      }
+      case '*': {
+        action = double_speed;
+        break;
+      }
     }
 
     // check modifiers

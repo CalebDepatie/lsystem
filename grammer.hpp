@@ -21,6 +21,8 @@ enum actions {
   turn_y_in,
   turn_y_out,
   split,
+  half_speed,
+  double_speed,
 };
 
 struct lsystem {

@@ -1,7 +1,6 @@
 iterations: 3
 draw_forward: F
-move_forward: M
-turn_angle: 22.5
+turn_angle: 180
 seed: 6326273
-axiom: F
-rules: F(50) F[=>,F]F F(50) F+F
+axiom: =F
+rules: F F=/F

@@ -28,7 +28,6 @@ int num_vertices = 0;
 
 float cx, cy, cz;
 
-constexpr GLfloat DIST_STEP = 0.1;
 constexpr bool BENCHMARK = false;
 
 auto init(std::vector<actions> action_list, lsystem l) -> void;
@@ -98,6 +97,7 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
   using head_state = std::tuple<glm::vec3, glm::vec3, GLuint>;
   // convert to radians
   GLfloat ANGLE_STEP = l.ANGLE_STEP * (3.14/180);
+  GLfloat DIST_STEP = 1.0;
 
   auto vertices = std::vector<GLfloat>();
   auto indices = std::vector<GLuint>();
@@ -213,6 +213,14 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
           cur_dir = glm::rotate(cur_dir, -ANGLE_STEP, glm::vec3(0,1,0));
         }
 
+        break;
+      }
+      case half_speed: {
+        DIST_STEP /= 2.0f;
+        break;
+      }
+      case double_speed: {
+        DIST_STEP *= 2.0;
         break;
       }
       case split: {
