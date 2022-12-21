@@ -4,3 +4,4 @@ asmt4
 *.pdf
 *.odt
 lsystem
+build/*
