@@ -18,7 +18,7 @@ auto lexString(lsystem p) -> std::vector<actions> {
   for (int i = 0; i < p.MAX_ITER; i++) {
     std::string newString = "";
 
-    for (int ci = 0; ci < expanded_string.size(); ci++) {
+    for (unsigned int ci = 0; ci < expanded_string.size(); ci++) {
       if (p.RULES.contains(expanded_string[ci])) {
         auto func = p.RULES[expanded_string[ci]];
         const std::string rule = func();
@@ -34,7 +34,7 @@ auto lexString(lsystem p) -> std::vector<actions> {
 
   auto action_list = std::vector<actions>();
 
-  for (int i = 0; i<expanded_string.size(); i++) {
+  for (unsigned int i = 0; i<expanded_string.size(); i++) {
     char c = expanded_string[i];
     actions action = empty;
 
@@ -131,17 +131,17 @@ auto generateLSystem(std::string_view filePath) -> lsystem {
       newProgram.MAX_ITER = std::stoi(words[1].data());
 
     } else if (words[0] == "draw_forward:") {
-      for (int i=1; i<words.size(); i++) {
+      for (unsigned int i=1; i<words.size(); i++) {
         newProgram.DRAW_FORWARD += words[i];
       }
 
     } else if (words[0] == "move_forward:") {
-      for (int i=1; i<words.size(); i++) {
+      for (unsigned int i=1; i<words.size(); i++) {
         newProgram.MOVE_FORWARD += words[i];
       }
 
     } else if (words[0] == "variable:") {
-      for (int i=1; i<words.size(); i++) {
+      for (unsigned int i=1; i<words.size(); i++) {
         newProgram.VARIABLE += words[i];
       }
 
@@ -159,7 +159,7 @@ auto generateLSystem(std::string_view filePath) -> lsystem {
       std::unordered_set<char> keys;
 
       // Collect the keys and their rules
-      for (int i=1; i<words.size(); i+=2) {
+      for (unsigned int i=1; i<words.size(); i+=2) {
         char key = words[i][0];
         keys.insert(key);
         auto value = words[i+1];
@@ -217,6 +217,8 @@ auto generateLSystem(std::string_view filePath) -> lsystem {
               return value_1;
             } else if (r < (percent_1+percent_2)) {
               return value_2;
+            } else [[unlikely]] {
+              return std::string(""); // warning removal
             }
           };
 

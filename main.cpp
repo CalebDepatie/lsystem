@@ -34,6 +34,7 @@ constexpr bool BENCHMARK = false;
 auto init(std::vector<actions> action_list, lsystem l) -> void;
 auto display() -> void;
 auto generateFromCommands(std::vector<actions> action_list, lsystem l);
+auto generateColours(const std::vector<GLfloat>::size_type colour_num) -> std::vector<GLfloat>;
 auto getTime() -> double;
 
 int main(int argc, char **argv) {
@@ -270,7 +271,7 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
   float xmin, ymin, zmin, xmax, ymax, zmax;
   xmin = ymin = zmin = 1000000.0;
 	xmax = ymax = zmax = -1000000.0;
-	for(int i=0; i<vertices.size()/3; i++) {
+	for(unsigned int i=0; i<vertices.size()/3; i++) {
 		if(vertices[3*i] < xmin)
 			xmin = vertices[3*i];
 		if(vertices[3*i] > xmax)
@@ -308,24 +309,16 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
   return std::make_tuple(vertices, indices);
 }
 
-auto init(std::vector<actions> action_list, lsystem l) -> void {
-  // glEnable(GL_PROGRAM_POINT_SIZE);
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  initGraphics();
-
-  const auto [vertices, indices] = generateFromCommands(action_list, l);
-
-  // for (const auto& index : indices) {
-  //   std::cout << index << std::endl;
-  // }
-
+auto generateColours(const std::vector<GLfloat>::size_type colour_num) -> std::vector<GLfloat> {
   // generate colour gradient
   // HSV conversions with the help of https://www.had2know.org/technology/hsv-rgb-conversion-formula-calculator.html
   auto colours = std::vector<GLfloat>();
-  for (int i = 0; i < vertices.size()/2; i++) {
-    const float H = (static_cast<float>(i)/(vertices.size()/2))*360;
+  for (unsigned int i = 0; i < colour_num; i++) {
+    const float H = (static_cast<float>(i)/(colour_num))*360;
     const float z = (1 - fabs(fmod((H/60), 2.0f) - 1));
-    float R, G, B;
+    float R = 0.0f;
+    float G = 0.0f;
+    float B = 0.0f;
 
     if (H < 60) {
       R = 1;
@@ -358,6 +351,16 @@ auto init(std::vector<actions> action_list, lsystem l) -> void {
     colours.push_back(B); // b
   }
 
+  return colours;
+}
+
+auto init(std::vector<actions> action_list, lsystem l) -> void {
+  initGraphics();
+
+  const auto [vertices, indices] = generateFromCommands(action_list, l);
+
+  auto colours = generateColours(vertices.size()/2);
+
   int vs = buildShader(GL_VERTEX_SHADER, (char*)"lsystem.vs");
   int fs = buildShader(GL_FRAGMENT_SHADER, (char*)"lsystem.fs");
   program = buildProgram(vs,fs,0);
@@ -366,7 +369,7 @@ auto init(std::vector<actions> action_list, lsystem l) -> void {
 	glBindVertexArray(lsystemVAO);
 
   lsystemBuffer = createIndexBuffer(indices);
-  GLuint vbuffer = createVertexBuffer({vertices, colours});
+  createVertexBuffer({vertices, colours});
 
   glUseProgram(program);
 
