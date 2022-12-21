@@ -1,4 +1,4 @@
-iterations: 11
+iterations: 8
 draw_forward: A B
 turn_angle: 60
 axiom: A

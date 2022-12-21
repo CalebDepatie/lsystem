@@ -20,6 +20,7 @@
 #include "shaders.h"
 #include "callbacks.hpp"
 #include "grammer.hpp"
+#include "graphics.hpp"
 
 GLuint lsystemVAO;
 GLuint lsystemBuffer;
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "can't initialize GLFW\n");
 	}
 
-  GLFWwindow* window = glfwCreateWindow(512, 512, "L-System", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(1024, 512, "L-System", NULL, NULL);
 
   if (!window) {
 		glfwTerminate();
@@ -67,17 +68,12 @@ int main(int argc, char **argv) {
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
   glfwMakeContextCurrent(window);
-	GLenum error = glewInit();
-	if(error != GLEW_OK) {
-		printf("Error starting GLEW: %s\n",glewGetErrorString(error));
-		exit(0);
-	}
 
   init(tokens, lsystem);
 
   glEnable(GL_DEPTH_TEST);
 	glClearColor(1.0,1.0,1.0,1.0);
-	glViewport(0, 0, 512, 512);
+	glViewport(0, 0, 1024, 512);
 
   glfwSwapInterval(1);
 
@@ -315,7 +311,7 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
 auto init(std::vector<actions> action_list, lsystem l) -> void {
   // glEnable(GL_PROGRAM_POINT_SIZE);
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glLineWidth(2.5);
+  initGraphics();
 
   const auto [vertices, indices] = generateFromCommands(action_list, l);
 
@@ -369,26 +365,13 @@ auto init(std::vector<actions> action_list, lsystem l) -> void {
   glGenVertexArrays(1, &lsystemVAO);
 	glBindVertexArray(lsystemVAO);
 
-  glGenBuffers(1, &lsystemBuffer);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lsystemBuffer);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-
-  GLuint vbuffer;
-  glGenBuffers(1, &vbuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, vbuffer);
-  glBufferData(GL_ARRAY_BUFFER, (vertices.size()+colours.size())*sizeof(GLfloat) , NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size()*sizeof(GLfloat), vertices.data());
-  glBufferSubData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), colours.size()*sizeof(GLfloat), colours.data());
+  lsystemBuffer = createIndexBuffer(indices);
+  GLuint vbuffer = createVertexBuffer({vertices, colours});
 
   glUseProgram(program);
 
-  GLint vPosition = glGetAttribLocation(program,"vPosition");
-	glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(vPosition);
-
-  GLint vColour = glGetAttribLocation(program,"vColour");
-	glVertexAttribPointer(vColour, 3, GL_FLOAT, GL_FALSE, 0, (void*) (vertices.size()*sizeof(GLfloat)));
-	glEnableVertexAttribArray(vColour);
+  createVertexAttrib("vPosition", program, 3, 0);
+  createVertexAttrib("vColour", program, 3, vertices.size()*sizeof(GLfloat));
 }
 
 auto display() -> void {
