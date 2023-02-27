@@ -5,7 +5,7 @@ project('L-System', 'cpp',
                      'optimization=g'])
 
 srcs = [
-  'main.cpp', 'grammer.cpp', 'callbacks.cpp', 'shaders.cpp', 'graphics.cpp',
+  'main.cpp', 'grammer.cpp', 'callbacks.cpp',
 ]
 
 # get dependencies

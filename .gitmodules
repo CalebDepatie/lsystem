@@ -1,3 +1,4 @@
 [submodule "VeloxEngine"]
 	path = subprojects/VeloxEngine
 	url = https://github.com/CalebDepatie/VeloxEngine.git
+	branch = opengl-graphics

@@ -18,7 +18,6 @@
 
 #include "core/dyn_array.ipp"
 
-#include "shaders.h"
 #include "callbacks.hpp"
 #include "grammer.hpp"
 #include "graphics.hpp"
@@ -30,7 +29,7 @@ int num_vertices = 0;
 
 float cx, cy, cz;
 
-constexpr bool BENCHMARK = false;
+constexpr bool BENCHMARK = true;
 
 auto init(velox::dyn_array<actions> action_list, lsystem l) -> void;
 auto display() -> void;
@@ -41,7 +40,7 @@ auto getTime() -> double;
 int main(int argc, char **argv) {
 
   if (argc < 2) {
-    std::cerr << "Please provide the path to the LSystem Definition" << std::endl;
+    velox::derr << "Please provide the path to the LSystem Definition" << std::endl;
     exit(0);
   }
 
@@ -54,7 +53,7 @@ int main(int argc, char **argv) {
 
   // initialize glfw
 	if (!glfwInit()) {
-		fprintf(stderr, "can't initialize GLFW\n");
+    velox::derr << "Can't initialize GLFW" << std::endl;
 	}
 
   GLFWwindow* window = glfwCreateWindow(1024, 512, "L-System", NULL, NULL);
@@ -153,14 +152,12 @@ auto generateFromCommands(velox::dyn_array<actions> action_list, lsystem l) {
           prev_vertex = vertex_num++;
         }
 
-        break;// constexpr GLfloat ANGLE_STEP = 1.570796;
+        break;
 
       }
       case forward: {
         for (auto& [head, cur_dir, prev_vertex] : cur_state) {
           head += (cur_dir * DIST_STEP);
-          // std::cout << "x: " << head.x << std::endl;
-          // std::cout << "y: " << head.y << std::endl << std::endl;
           addVertex(head);
 
           indices.emplace_back(prev_vertex);
@@ -260,7 +257,7 @@ auto generateFromCommands(velox::dyn_array<actions> action_list, lsystem l) {
         break;
       }
       default: {
-        std::cerr << "Action undefined" << std::endl;
+        velox::derr << "Action undefined" << std::endl;
         exit(0);
       }
     };
@@ -301,10 +298,9 @@ auto generateFromCommands(velox::dyn_array<actions> action_list, lsystem l) {
   if constexpr(BENCHMARK) {
     auto end = getTime();
 
-    std::cout << "s " << start / CLOCKS_PER_SEC << std::endl;
-    std::cout << "e " << end / CLOCKS_PER_SEC << std::endl;
-
-    std::cout << "Creating vertices took: " << static_cast<double>(end - start) / CLOCKS_PER_SEC << std::endl;
+    velox::dout << "s " << start / CLOCKS_PER_SEC << std::endl;
+    velox::dout << "e " << end / CLOCKS_PER_SEC << std::endl;
+    velox::dout << "Creating vertices took: " << static_cast<double>(end - start) / CLOCKS_PER_SEC << std::endl;
   }
 
   return std::make_tuple(vertices, indices);
@@ -356,26 +352,26 @@ auto generateColours(const velox::dyn_array<GLfloat>::size_type colour_num) -> v
 }
 
 auto init(velox::dyn_array<actions> action_list, lsystem l) -> void {
-  initGraphics();
+  velox::initGraphics();
 
   const auto [vertices, indices] = generateFromCommands(action_list, l);
 
   auto colours = generateColours(vertices.size()/2);
 
-  int vs = buildShader(GL_VERTEX_SHADER, (char*)"lsystem.vs");
-  int fs = buildShader(GL_FRAGMENT_SHADER, (char*)"lsystem.fs");
-  program = buildProgram(vs,fs,0);
+  int vs = velox::buildShader(GL_VERTEX_SHADER, (char*)"lsystem.vs");
+  int fs = velox::buildShader(GL_FRAGMENT_SHADER, (char*)"lsystem.fs");
+  program = velox::buildProgram(vs,fs,0);
 
   glGenVertexArrays(1, &lsystemVAO);
 	glBindVertexArray(lsystemVAO);
 
-  lsystemBuffer = createIndexBuffer(indices);
-  createVertexBuffer({vertices, colours});
+  lsystemBuffer = velox::createIndexBuffer(indices);
+  velox::createVertexBuffer({vertices, colours});
 
   glUseProgram(program);
 
-  createVertexAttrib("vPosition", program, 3, 0);
-  createVertexAttrib("vColour", program, 3, vertices.size()*sizeof(GLfloat));
+  velox::createVertexAttrib("vPosition", program, 3, 0);
+  velox::createVertexAttrib("vColour", program, 3, vertices.size()*sizeof(GLfloat));
 }
 
 auto display() -> void {
