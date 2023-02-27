@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <functional>
 
-constexpr int MAX_ITER = 3;
-
 enum actions {
   empty,
   push,
