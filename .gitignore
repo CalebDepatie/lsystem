@@ -5,3 +5,4 @@ asmt4
 *.odt
 lsystem
 build/*
+subprojects/*

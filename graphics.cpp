@@ -22,7 +22,7 @@ auto initGraphics() -> void {
   glLineWidth(2.5);
 }
 
-auto createIndexBuffer(std::vector<GLuint> arr) -> GLuint {
+auto createIndexBuffer(velox::dyn_array<GLuint> arr) -> GLuint {
   GLuint buffer;
   glGenBuffers(1, &buffer);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
@@ -31,14 +31,14 @@ auto createIndexBuffer(std::vector<GLuint> arr) -> GLuint {
   return buffer;
 }
 
-auto createVertexBuffer(std::initializer_list<std::vector<GLfloat>> arrays) -> GLuint {
+auto createVertexBuffer(std::initializer_list<velox::dyn_array<GLfloat>> arrays) -> GLuint {
   GLuint buffer;
 
   glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
 
   // reduce size
-  std::vector<GLfloat>::size_type size = 0;
+  velox::dyn_array<GLfloat>::size_type size = 0;
   for (const auto& arr : arrays) {
     size += arr.size();
   }
@@ -46,7 +46,7 @@ auto createVertexBuffer(std::initializer_list<std::vector<GLfloat>> arrays) -> G
   glBufferData(GL_ARRAY_BUFFER, size*sizeof(GLfloat), NULL, GL_STATIC_DRAW);
 
   // create subbuffers
-  std::vector<GLfloat>::size_type cur_offset = 0;
+  velox::dyn_array<GLfloat>::size_type cur_offset = 0;
   for (const auto& arr : arrays) {
     glBufferSubData(GL_ARRAY_BUFFER, cur_offset*sizeof(GLfloat), arr.size()*sizeof(GLfloat), arr.data());
     cur_offset += arr.size();

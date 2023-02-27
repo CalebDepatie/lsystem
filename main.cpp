@@ -10,12 +10,13 @@
 
 #include <string>
 #include <string_view>
-#include <vector>
 #include <tuple>
 #include <stack>
 #include <algorithm>
 #include <iostream>
 #include <bits/stdc++.h>
+
+#include "core/dyn_array.ipp"
 
 #include "shaders.h"
 #include "callbacks.hpp"
@@ -31,10 +32,10 @@ float cx, cy, cz;
 
 constexpr bool BENCHMARK = false;
 
-auto init(std::vector<actions> action_list, lsystem l) -> void;
+auto init(velox::dyn_array<actions> action_list, lsystem l) -> void;
 auto display() -> void;
-auto generateFromCommands(std::vector<actions> action_list, lsystem l);
-auto generateColours(const std::vector<GLfloat>::size_type colour_num) -> std::vector<GLfloat>;
+auto generateFromCommands(velox::dyn_array<actions> action_list, lsystem l);
+auto generateColours(const velox::dyn_array<GLfloat>::size_type colour_num) -> velox::dyn_array<GLfloat>;
 auto getTime() -> double;
 
 int main(int argc, char **argv) {
@@ -90,17 +91,17 @@ int main(int argc, char **argv) {
 }
 
 
-auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
+auto generateFromCommands(velox::dyn_array<actions> action_list, lsystem l) {
   using head_state = std::tuple<glm::vec3, glm::vec3, GLuint>;
   // convert to radians
   GLfloat ANGLE_STEP = l.ANGLE_STEP * (3.14/180);
   GLfloat DIST_STEP = 1.0;
 
-  auto vertices = std::vector<GLfloat>();
-  auto indices = std::vector<GLuint>();
+  auto vertices = velox::dyn_array<GLfloat>();
+  auto indices = velox::dyn_array<GLuint>();
 
-  auto cur_state = std::vector<head_state>();
-  auto tree_stack = std::stack<std::vector<head_state>>();
+  auto cur_state = velox::dyn_array<head_state>();
+  auto tree_stack = std::stack<velox::dyn_array<head_state>>();
 
   GLuint vertex_num = 0;
 
@@ -221,7 +222,7 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
         break;
       }
       case split: {
-        auto new_state = std::vector<head_state>();
+        auto new_state = velox::dyn_array<head_state>();
 
         for (auto& [head, cur_dir, prev_vertex] : cur_state) {
           // create perpindicular heads
@@ -309,10 +310,10 @@ auto generateFromCommands(std::vector<actions> action_list, lsystem l) {
   return std::make_tuple(vertices, indices);
 }
 
-auto generateColours(const std::vector<GLfloat>::size_type colour_num) -> std::vector<GLfloat> {
+auto generateColours(const velox::dyn_array<GLfloat>::size_type colour_num) -> velox::dyn_array<GLfloat> {
   // generate colour gradient
   // HSV conversions with the help of https://www.had2know.org/technology/hsv-rgb-conversion-formula-calculator.html
-  auto colours = std::vector<GLfloat>();
+  auto colours = velox::dyn_array<GLfloat>();
   for (unsigned int i = 0; i < colour_num; i++) {
     const float H = (static_cast<float>(i)/(colour_num))*360;
     const float z = (1 - fabs(fmod((H/60), 2.0f) - 1));
@@ -354,7 +355,7 @@ auto generateColours(const std::vector<GLfloat>::size_type colour_num) -> std::v
   return colours;
 }
 
-auto init(std::vector<actions> action_list, lsystem l) -> void {
+auto init(velox::dyn_array<actions> action_list, lsystem l) -> void {
   initGraphics();
 
   const auto [vertices, indices] = generateFromCommands(action_list, l);

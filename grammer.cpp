@@ -10,7 +10,7 @@
 #include <ranges>
 
 // lexing and parsing are the same due to the token syntax
-auto lexString(lsystem p) -> std::vector<actions> {
+auto lexString(lsystem p) -> velox::dyn_array<actions> {
   // expansion
   std::string expanded_string = std::move(p.AXIOM.data());
   srand(p.SEED);
@@ -32,7 +32,7 @@ auto lexString(lsystem p) -> std::vector<actions> {
 
   }
 
-  auto action_list = std::vector<actions>();
+  auto action_list = velox::dyn_array<actions>();
 
   for (unsigned int i = 0; i<expanded_string.size(); i++) {
     char c = expanded_string[i];
@@ -120,7 +120,7 @@ auto generateLSystem(std::string_view filePath) -> lsystem {
       break;
 
     //split string to words
-    std::vector<std::string> words;
+    velox::dyn_array<std::string> words;
     std::istringstream iss(cur_line);
     std::string cur_word;
     while (std::getline(iss, cur_word, ' ')) {
@@ -155,7 +155,7 @@ auto generateLSystem(std::string_view filePath) -> lsystem {
       newProgram.AXIOM = words[1];
 
     } else if (words[0] == "rules:") {
-      std::vector<std::tuple<std::string, std::string>> temp_rules;
+      velox::dyn_array<std::tuple<std::string, std::string>> temp_rules;
       std::unordered_set<char> keys;
 
       // Collect the keys and their rules
@@ -176,7 +176,7 @@ auto generateLSystem(std::string_view filePath) -> lsystem {
           return std::get<0>(el)[0] == k;
         };
 
-        std::vector<std::tuple<std::string, std::string>> rules;
+        velox::dyn_array<std::tuple<std::string, std::string>> rules;
         for (const auto& t_r : temp_rules) {
           if (predicate(t_r))
             rules.push_back(t_r);

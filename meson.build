@@ -17,6 +17,10 @@ depends += cpp.find_library('GLU')
 depends += cpp.find_library('glfw')
 depends += cpp.find_library('GL')
 
+velox = subproject('VeloxEngine')
+depends += velox.get_variable('velox_dep')
+inc_dir = velox.get_variable('includes')
+
 # copy shaders
 configure_file(input  : 'lsystem.fs',
                output : 'lsystem.fs',
@@ -25,4 +29,6 @@ configure_file(input  : 'lsystem.vs',
                output : 'lsystem.vs',
                copy   : true)
 
-executable('lsystem', [srcs], dependencies : depends)
+executable('lsystem', [srcs],
+	dependencies : depends,
+	include_directories : inc_dir)

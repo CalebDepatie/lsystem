@@ -2,9 +2,9 @@
 
 #include <string_view>
 #include <string>
-#include <vector>
 #include <unordered_map>
 #include <functional>
+#include "core/dyn_array.ipp"
 
 enum actions {
   empty,
@@ -35,4 +35,4 @@ struct lsystem {
 };
 
 auto generateLSystem(std::string_view filePath) -> lsystem;
-auto lexString(lsystem p) -> std::vector<actions>;
+auto lexString(lsystem p) -> velox::dyn_array<actions>;
